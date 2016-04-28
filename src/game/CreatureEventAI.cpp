@@ -1064,11 +1064,11 @@ void CreatureEventAI::JustRespawned()                       // NOTE that this is
 
     for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
     {
-        // Reset generic timer
+        // Reset generic timer because rest is reset properly in Reset()
         if (i->Event.event_type == EVENT_T_TIMER_GENERIC)
         {
-            if (i->UpdateRepeatTimer(m_creature, i->Event.timer.initialMin, i->Event.timer.initialMax))
-                i->Enabled = true;
+            i->Enabled = true;
+            i->Time = 0;
         }
         // Handle Spawned Events
         else if (SpawnedEventConditionsCheck(i->Event))
@@ -1089,16 +1089,12 @@ void CreatureEventAI::Reset()
         switch (event.event_type)
         {
             // Reset all out of combat timers
-            case EVENT_T_TIMER_OOC:
-            {
-                if (i->UpdateRepeatTimer(m_creature, event.timer.initialMin, event.timer.initialMax))
-                    i->Enabled = true;
+            case EVENT_T_TIMER_GENERIC:
                 break;
-            }
             default:
                 // TODO: enable below code line / verify this is correct to enable events previously disabled (ex. aggro yell), instead of enable this in void Aggro()
-                //i->Enabled = true;
-                //i->Time = 0;
+                i->Enabled = true;
+                i->Time = 0;
                 break;
         }
     }
@@ -1229,10 +1225,10 @@ void CreatureEventAI::EnterCombat(Unit* enemy)
                     i->Enabled = true;
                 break;
             // All normal events need to be re-enabled and their time set to 0
-            default:
-                i->Enabled = true;
-                i->Time = 0;
-                break;
+            //default:
+            //    i->Enabled = true;
+            //    i->Time = 0;
+            //    break;
         }
     }
 
